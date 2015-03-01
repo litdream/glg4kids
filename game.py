@@ -5,7 +5,7 @@ import pygame
 import random
 import time
 
-BOWL = False
+BOWL = True
 
 BLACK = ( 0, 0, 0)
 WHITE = ( 255, 255, 255)
@@ -199,7 +199,50 @@ class VerySlowBowlingBall(pygame.sprite.Sprite):
         if self.rect.y < 0:
             self.bulletGroup.remove(self)
 
-            
+
+class VeryFastBowlingBall(pygame.sprite.Sprite):
+    def __init__(self, bullets, x):
+        if sys.version[0] == '2':
+            pygame.sprite.Sprite.__init__(self)
+        else:
+            super().__init__()
+        self.bulletGroup = bullets
+        size = (400,200)
+        self.image = pygame.image.load("red-bowl.jpg").convert()
+        self.rect = self.image.get_rect()
+
+        self.rect.x = x
+        self.rect.y = 350
+        self.bulletGroup.add(self)
+        
+    def update(self):
+        self.rect.y -= 20
+        if self.rect.y < 0:
+            self.bulletGroup.remove(self)
+
+
+class VeryFastWideBowlingBall(pygame.sprite.Sprite):
+    def __init__(self, bullets, x):
+        if sys.version[0] == '2':
+            pygame.sprite.Sprite.__init__(self)
+        else:
+            super().__init__()
+        self.bulletGroup = bullets
+        size = (400,300)
+        self.image = pygame.image.load("red-bowl.jpg").convert()
+        self.image = pygame.transform.scale(self.image, size)        
+        self.rect = self.image.get_rect()
+
+        self.rect.x = 10
+        self.rect.y = 350
+        self.bulletGroup.add(self)
+        
+    def update(self):
+        self.rect.y -= 20
+        if self.rect.y < 0:
+            self.bulletGroup.remove(self)
+
+                                                            
 class LittleStar(pygame.sprite.Sprite):
     def __init__(self, x,y):
         if sys.version[0] == '2':
@@ -227,8 +270,10 @@ def bowl(bullets, ship):
     if len(bullets) < 2:
         #newBullet = BowlingBall(bullets, ship.rect.x)
         #newBullet = FastBowlingBall(bullets, ship.rect.x)
-        newBullet = VerySlowBowlingBall(bullets, ship.rect.x)
-
+        #newBullet = VerySlowBowlingBall(bullets, ship.rect.x)
+        #newBullet = VeryFastBowlingBall(bullets, ship.rect.x)
+        newBullet = VeryFastWideBowlingBall(bullets, ship.rect.x)
+        
         #pygame.mixer.music.load('laser1.ogg')
         pygame.mixer.music.load('bowl.ogg')
         pygame.mixer.music.play()
