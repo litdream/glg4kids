@@ -5,8 +5,6 @@ import pygame
 import random
 import time
 
-BOWL = True
-
 BLACK = ( 0, 0, 0)
 WHITE = ( 255, 255, 255)
 RED  = ( 255,0,0)
@@ -42,14 +40,16 @@ class Ship(pygame.sprite.Sprite):
             self.rect.x = 10
         if self.rect.x > 370:
             self.rect.x = 370
-            
+
+
+        
 class Bee(pygame.sprite.Sprite):
-    def __init__(self, badbull, x,y):
+    def __init__(self, badbull, x,y, gif="galaga-bee.gif"):
         if sys.version[0] == '2':
             pygame.sprite.Sprite.__init__(self)
         else:
             super().__init__()
-        self.image = pygame.image.load("galaga-bee.gif").convert()
+        self.image = pygame.image.load(gif).convert()
         self.image = pygame.transform.rotate(self.image, 180)
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -82,7 +82,22 @@ class Bee(pygame.sprite.Sprite):
             self.shoot = random.randint(50,300)
             b = BadBullet(self.badbull, self.rect.x, self.rect.y)
             self.badbull.add(b)
-            
+
+class BossGalaga(Bee):
+    def __init__(self, badbull, x,y):
+        if sys.version[0] == '2':
+            Bee.__init__(self, badbull, x,y, "boss_galaga.gif")
+        else:
+            super().__init__()
+
+class ButterFly(Bee):
+    def __init__(self, badbull, x,y):
+        if sys.version[0] == '2':
+            Bee.__init__(self, badbull, x,y, "galaga-butter-fly.png")
+        else:
+            super().__init__()
+
+        
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, bullets, x):
         if sys.version[0] == '2':
@@ -129,15 +144,20 @@ class BadBullet(pygame.sprite.Sprite):
 
             
 class BowlingBall(pygame.sprite.Sprite):
-    def __init__(self, bullets, x):
+    def __init__(self, bullets, x, offset=3, bowl_w=200, bowl_h=200):
         if sys.version[0] == '2':
             pygame.sprite.Sprite.__init__(self)
         else:
             super().__init__()
         self.bulletGroup = bullets
-        size = (200,200)
+        self._add_bowl(bowl_w, bowl_h, offset)
+
+    def _add_bowl(self, bowl_width, bowl_height, offset):    
+        size = (bowl_width, bowl_height)
+        self.offset= offset
         self.image = pygame.Surface(size)
         self.image.fill(WHITE)
+        self.image = pygame.image.load("red-bowl.jpg").convert()
         pygame.draw.circle(self.image, WHITE, (x,550),50)
         self.rect = self.image.get_rect()
 
@@ -146,103 +166,25 @@ class BowlingBall(pygame.sprite.Sprite):
         self.bulletGroup.add(self)
         
     def update(self):
-        self.rect.y -= 3
+        self.rect.y -= self.offset
         if self.rect.y < 0:
             self.bulletGroup.remove(self)
 
-class FastBowlingBall(pygame.sprite.Sprite):
-    def __init__(self, bullets, x):
+class FastBowlingBall(BowlingBall):
+    def __init__(self, bullets, x, offset=30):
         if sys.version[0] == '2':
-            pygame.sprite.Sprite.__init__(self)
+            BowlingBall.__init__(self, bullets, x, offset)
         else:
-            super().__init__()
-        self.bulletGroup = bullets
-        size = (400,200)
-        self.image = pygame.Surface(size)
-        #self.image.fill(RED)
-        self.image.fill(GREEN)
-        pygame.draw.circle(self.image, WHITE, (x,550),50)
-        self.rect = self.image.get_rect()
+            super().__init__(self, bullets, x, offset)
 
-        self.rect.x = 0
-        self.rect.y = 550
-        self.bulletGroup.add(self)
-        
-    def update(self):
-        self.rect.y -= 30
-        if self.rect.y < 0:
-            self.bulletGroup.remove(self)
+class VerySlowBowlingBall(BowlingBall):
+    def __init__(self, bullets, x, offset=2 ):
+        if sys.version[0] == '2':
+            BowlingBall.__init__(self, bullets, x, offset, 500,200)
+        else:
+            super().__init__(self, bullets, x, offset, 500,200)
 
             
-class VerySlowBowlingBall(pygame.sprite.Sprite):
-    def __init__(self, bullets, x):
-        if sys.version[0] == '2':
-            pygame.sprite.Sprite.__init__(self)
-        else:
-            super().__init__()
-        self.bulletGroup = bullets
-        size = (400,200)
-        self.image = pygame.image.load("red-bowl.jpg").convert()
-        self.rect = self.image.get_rect()
-
-        self.rect.x = x
-        self.rect.y = 350
-        self.bulletGroup.add(self)
-        self.slower = 3
-        
-    def update(self):
-        self.slower -= 1
-        if self.slower == 0:
-            self.rect.y -= 1
-            self.slower = 3
-            
-        if self.rect.y < 0:
-            self.bulletGroup.remove(self)
-
-
-class VeryFastBowlingBall(pygame.sprite.Sprite):
-    def __init__(self, bullets, x):
-        if sys.version[0] == '2':
-            pygame.sprite.Sprite.__init__(self)
-        else:
-            super().__init__()
-        self.bulletGroup = bullets
-        size = (400,200)
-        self.image = pygame.image.load("red-bowl.jpg").convert()
-        self.rect = self.image.get_rect()
-
-        self.rect.x = x
-        self.rect.y = 350
-        self.bulletGroup.add(self)
-        
-    def update(self):
-        self.rect.y -= 20
-        if self.rect.y < 0:
-            self.bulletGroup.remove(self)
-
-
-class VeryFastWideBowlingBall(pygame.sprite.Sprite):
-    def __init__(self, bullets, x):
-        if sys.version[0] == '2':
-            pygame.sprite.Sprite.__init__(self)
-        else:
-            super().__init__()
-        self.bulletGroup = bullets
-        size = (400,300)
-        self.image = pygame.image.load("red-bowl.jpg").convert()
-        self.image = pygame.transform.scale(self.image, size)        
-        self.rect = self.image.get_rect()
-
-        self.rect.x = 10
-        self.rect.y = 350
-        self.bulletGroup.add(self)
-        
-    def update(self):
-        self.rect.y -= 20
-        if self.rect.y < 0:
-            self.bulletGroup.remove(self)
-
-                                                            
 class LittleStar(pygame.sprite.Sprite):
     def __init__(self, x,y):
         if sys.version[0] == '2':
@@ -268,21 +210,28 @@ def shoot(bullets, ship):
 
 def bowl(bullets, ship):
     if len(bullets) < 2:
-        #newBullet = BowlingBall(bullets, ship.rect.x)
+        newBullet = BowlingBall(bullets, ship.rect.x)
         #newBullet = FastBowlingBall(bullets, ship.rect.x)
         #newBullet = VerySlowBowlingBall(bullets, ship.rect.x)
-        #newBullet = VeryFastBowlingBall(bullets, ship.rect.x)
-        newBullet = VeryFastWideBowlingBall(bullets, ship.rect.x)
-        
+
         #pygame.mixer.music.load('laser1.ogg')
         pygame.mixer.music.load('bowl.ogg')
         pygame.mixer.music.play()
 
+def buldozer(bullets, ship):
+    if len(bullets) < 1:
+        newBullet = VerySlowBowlingBall(bullets, ship.rect.x)
+
+        pygame.mixer.music.load('bowl.ogg')
+        pygame.mixer.music.play()
+
+        
 if __name__ == '__main__':
     FULL_SOUND = True
     WIN = False
+    mode = "bullet"
     try:
-        s = sys.argv[1]
+        mode = sys.argv[1]
         FULL_SOUND = False
     except:
         pass
@@ -301,13 +250,26 @@ if __name__ == '__main__':
     allSprites.add(ship)
     goodGuys.add(ship)
 
-    for i in range(0,10):
+    for i in range(0,4):
+        boss = BossGalaga(badBullets,
+                  random.randint(50,350), 10)
+        allSprites.add(boss)
+        badGuys.add(boss)
+        
+    for i in range(0,7):
         bee = Bee( badBullets,
                   random.randint(50,350),
-                  random.randint(0,4)*50)
+                   random.randint(1,4)*50 + 10)
         allSprites.add(bee)
         badGuys.add(bee)
 
+    for i in range(0,3):
+        butfly = ButterFly(badBullets,
+                  random.randint(50,350),
+                   random.randint(1,4)*50 + 10)
+        allSprites.add(butfly)
+        badGuys.add(butfly)
+            
     for i in range(0,50):
         x = random.randint(0,400)
         y = random.randint(0,600)
@@ -326,6 +288,7 @@ if __name__ == '__main__':
     
     clock = pygame.time.Clock()
     done = False
+
     while not done:
         screen.fill(BLACK)
         for event in pygame.event.get():
@@ -337,12 +300,13 @@ if __name__ == '__main__':
                 if event.key == pygame.K_RIGHT:
                     ship.move_right = True
                 if event.key == pygame.K_SPACE:
-                    if BOWL:
-                        bowl(bullets, ship)
-                    else:
+                    if mode == "bullet":
                         shoot(bullets, ship)
-
-                    
+                    elif mode == "bowl":
+                        bowl(bullets, ship)
+                    elif mode == "buldozer":
+                        buldozer(bullets, ship)
+                        
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
                     ship.move_left = False
@@ -359,7 +323,7 @@ if __name__ == '__main__':
             for bee in blocks_hit_list:
                 pygame.mixer.music.load('hit.ogg')
                 pygame.mixer.music.play()
-                if not BOWL:
+                if mode not in ( "bowl", "buldozer" ):
                     bullets.remove(bullet)
 
         # detect player hit
