@@ -88,14 +88,14 @@ class BossGalaga(Bee):
         if sys.version[0] == '2':
             Bee.__init__(self, badbull, x,y, "boss_galaga.gif")
         else:
-            super().__init__()
+            super().__init__(badbull, x,y, "boss_galaga.gif")
 
 class ButterFly(Bee):
     def __init__(self, badbull, x,y):
         if sys.version[0] == '2':
             Bee.__init__(self, badbull, x,y, "galaga-butter-fly.png")
         else:
-            super().__init__()
+            super().__init__(badbull, x,y, "boss_galaga.gif")            
 
         
 class Bullet(pygame.sprite.Sprite):
@@ -175,14 +175,14 @@ class FastBowlingBall(BowlingBall):
         if sys.version[0] == '2':
             BowlingBall.__init__(self, bullets, x, offset)
         else:
-            super().__init__(self, bullets, x, offset)
+            super().__init__(bullets, x, offset)
 
 class VerySlowBowlingBall(BowlingBall):
     def __init__(self, bullets, x, offset=2 ):
         if sys.version[0] == '2':
             BowlingBall.__init__(self, bullets, x, offset, 500,200)
         else:
-            super().__init__(self, bullets, x, offset, 500,200)
+            super().__init__(bullets, x, offset, 500,200)
 
             
 class LittleStar(pygame.sprite.Sprite):
@@ -252,7 +252,8 @@ if __name__ == '__main__':
 
     for i in range(0,4):
         boss = BossGalaga(badBullets,
-                  random.randint(50,350), 10)
+            random.randint(50,350), 
+            random.randint(1,4)*50 + 10)
         allSprites.add(boss)
         badGuys.add(boss)
         
